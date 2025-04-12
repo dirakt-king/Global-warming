@@ -1,0 +1,29 @@
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://example.com/articles/global-warming"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Извлекаем заголовки и параграфы
+titles = [h2.text for h2 in soup.find_all('h2')]
+paragraphs = [p.text for p in soup.find_all('p')]
+
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+text = " ".join(paragraphs)
+wc = WordCloud(width=800, height=400, background_color='white').generate(text)
+
+plt.figure(figsize=(10, 5))
+plt.imshow(wc, interpolation='bilinear')
+plt.axis('off')
+plt.show()
+from collections import Counter
+import nltk
+nltk.download('punkt')
+
+tokens = nltk.word_tokenize(text.lower())
+filtered_tokens = [word for word in tokens if word.isalpha() and word not in stopwords]
+word_freq = Counter(filtered_tokens)
+print(word_freq.most_common(20))
