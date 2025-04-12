@@ -27,3 +27,65 @@ tokens = nltk.word_tokenize(text.lower())
 filtered_tokens = [word for word in tokens if word.isalpha() and word not in stopwords]
 word_freq = Counter(filtered_tokens)
 print(word_freq.most_common(20))
+import pandas as pd
+df['date'] = pd.to_datetime(df['date'])
+df.set_index('date', inplace=True)
+
+monthly_counts = df.resample('M')['text'].count()
+monthly_counts.plot(title="Количество статей про глобальное потепление по месяцам")
+from bertopic import BERTopic
+
+model = BERTopic(language="multilingual")
+topics, probs = model.fit_transform(list_of_texts)
+model.visualize_topics()
+import spacy
+nlp = spacy.load("en_core_web_sm")
+doc = nlp("Floods in Pakistan and wildfires in California were devastating.")
+
+locations = [ent.text for ent in doc.ents if ent.label_ == "GPE"]
+print(locations)  # ['Pakistan', 'California']
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+analyzer = SentimentIntensityAnalyzer()
+score = analyzer.polarity_scores("Global warming is a serious and frightening issue.")
+print(score)
+from natasha import NamesExtractor, Segmenter, Doc, NewsNERTagger, MorphVocab
+
+text = "Наводнения в Пакистане и засуха в Африке вызвали международную тревогу."
+
+segmenter = Segmenter()
+ner_tagger = NewsNERTagger()
+doc = Doc(text)
+doc.segment(segmenter)
+doc.tag_ner(ner_tagger)
+
+geo_entities = [span.text for span in doc.spans if span.type == 'LOC']
+print(geo_entities)  # ['Пакистане', 'Африке']
+rom collections import Counter
+
+all_locations = ['India', 'Australia', 'India', 'Germany', 'USA', 'Australia']
+
+location_counts = Counter(all_locations)
+print(location_counts.most_common(5))
+# [('India', 2), ('Australia', 2), ('Germany', 1), ('USA', 1)]
+import folium
+from geopy.geocoders import Nominatim
+
+geo_counts = {'India': 10, 'Australia': 5, 'USA': 15}
+
+map = folium.Map(location=[20, 0], zoom_start=2)
+geolocator = Nominatim(user_agent="geo_analysis")
+
+for location, count in geo_counts.items():
+    loc = geolocator.geocode(location)
+    if loc:
+        folium.CircleMarker(
+            location=[loc.latitude, loc.longitude],
+            radius=count,
+            popup=f"{location}: {count}",
+            color="crimson",
+            fill=True,
+            fill_color="crimson"
+        ).add_to(map)
+
+map.save("geo_mentions.html")
